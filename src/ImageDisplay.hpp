@@ -1,7 +1,7 @@
 #ifndef IMAGEDISPLAY_HPP_
 #define IMAGEDISPLAY_HPP_
 
-#include "CImg.h"
+#include <CImg.h>
 
 #include "Types.hpp"
 
@@ -9,8 +9,7 @@ class ImageDisplay
 {
 public:
 
-    explicit ImageDisplay(
-        const std::string& title)
+    explicit ImageDisplay(const std::string& title)
     : m_title(title), m_cimgdisplay(), m_cimg()
     {
         m_cimgdisplay.show();
@@ -19,29 +18,23 @@ public:
 
     ~ImageDisplay()
     {
-        close();
+        m_cimgdisplay.close();
     }
 
-    void update_image(
-        const std::string& image_path)
+    void update_image(const std::string& image_path)
     {
         m_cimg.assign(image_path.c_str());
         m_cimgdisplay.display(m_cimg);
         set_title();
     }
 
-    void wait()
-    {
-        while (!m_cimgdisplay.is_closed())
-        {
-            m_cimgdisplay.wait();
-        }
-    }
-
-    void close()
-    {
-        m_cimgdisplay.close();
-    }
+    // void wait()
+    // {
+    //     while (!m_cimgdisplay.is_closed())
+    //     {
+    //         m_cimgdisplay.wait();
+    //     }
+    // }
 
 private:
 
@@ -56,6 +49,6 @@ private:
     cimg_library::CImg<pixel_t> m_cimg;
 };
 
-typedef std::shared_ptr<ImageDisplay> ImageDisplayPtr;
+typedef std::shared_ptr<ImageDisplay> ImageDisplay_ptr;
 
 #endif /** IMAGEDISPLAY_HPP_ */

@@ -1,0 +1,4 @@
+.vscode/
+bin/
+*.o
+src/image_processor
