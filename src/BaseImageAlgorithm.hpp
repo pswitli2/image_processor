@@ -1,6 +1,8 @@
 #ifndef BASEIMAGEALGORITHM_HPP_
 #define BASEIMAGEALGORITHM_HPP_
 
+#include <chrono>
+
 #include "ImageDisplay.hpp"
 
 class BaseImageAlgorithm
@@ -19,6 +21,8 @@ public:
         m_height = height;
         m_area = area;
 
+        m_duration = 0.0;
+
         if (display_flag)
         {
             m_display = std::make_shared<ImageDisplay>("Post " + name());
@@ -31,10 +35,13 @@ public:
 
     virtual bool update(const std::filesystem::path& input_file, const Image& input, Image& output)
     {
+        const auto start = std::chrono::high_resolution_clock::now();
         if (!update_impl(input, output))
         {
             return false;
         }
+        const auto end = std::chrono::high_resolution_clock::now();
+        m_duration += (double) std::chrono::duration_cast<std::chrono::microseconds>( end - start ).count();
 
         const std::string output_file = m_output_dir / input_file.filename();
         output.write(output_file);
@@ -45,6 +52,8 @@ public:
 
         return true;
     }
+
+    double duration() { return m_duration / 1e6; }
 
 protected:
 
@@ -65,6 +74,8 @@ private:
     size_t m_width;
     size_t m_height;
     size_t m_area;
+
+    double m_duration;
 
     std::filesystem::path m_output_dir;
 

@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 
+#include "Logger.hpp"
 #include "Types.hpp"
 
 class ConfigFile
@@ -31,6 +32,7 @@ public:
     static const std::filesystem::path input_dir() { return m_input_dir; }
     static const std::filesystem::path output_dir() { return m_output_dir; }
     static DisplayType display_type() { return m_display_type; }
+    static LogLevel log_level() { return m_log_level; }
     static double delay() { return m_delay; }
     static const std::string error() { return m_error; }
 
@@ -76,14 +78,17 @@ public:
         return true;
     }
 
-    static void print_params()
+    static std::string to_string()
     {
-        std::cout << "ConfigFile Parameters:" << std::endl;
+        std::stringstream ss;
+        ss << "ConfigFile Parameters:" << std::endl;
         for (const auto param: m_params)
         {
-            std::cout << "  " << param.first << " = " << param.second << std::endl;
+            ss << "  " << param.first << " = " << param.second << std::endl;
         }
+        return ss.str();
     }
+
 private:
 
     typedef std::map<std::string, std::string> ParamMap;
@@ -158,6 +163,7 @@ private:
     static bool extract_params()
     {
         bool display_type_found = false;
+        bool log_level_found = false;
         m_delay = -1.0;
         for (const auto& param: m_params)
         {
@@ -185,6 +191,17 @@ private:
                     {
                         m_display_type = (DisplayType) i;
                         display_type_found = true;
+                    }
+                }
+            }
+            else if (key == "LOG_LEVEL")
+            {
+                for (size_t i = 0; i < LogLevelInt(LogLevel::SIZE); i++)
+                {
+                    if (val == LogLevelString((LogLevel) i))
+                    {
+                        m_log_level = (LogLevel) i;
+                        log_level_found = true;
                     }
                 }
             }
@@ -216,6 +233,11 @@ private:
             m_error = "DISPLAY_TYPE param invalid or not found";
             return false;
         }
+        if (!log_level_found)
+        {
+            m_error = "LOG_LEVEL param invalid or not found";
+            return false;
+        }
         if (m_delay < 0.0)
         {
             m_error = "DELAY param invalid or not found";
@@ -230,6 +252,7 @@ private:
     inline static std::filesystem::path m_input_dir;
     inline static std::filesystem::path m_output_dir;
     inline static DisplayType m_display_type;
+    inline static LogLevel m_log_level;
     inline static double m_delay;
 
     inline static ParamMap m_params;

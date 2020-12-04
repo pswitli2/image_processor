@@ -102,12 +102,15 @@ public:
                 usleep(ConfigFile::delay() * 1e6);
                 input = output;
             }
+            m_image_count++;
         }
 
         return true;
     }
 
     std::string error() { return m_error; }
+
+    size_t image_count() { return m_image_count; }
 
 protected:
 private:
@@ -121,6 +124,8 @@ private:
 
     size_t m_width;
     size_t m_height;
+
+    size_t m_image_count;
 };
 
 #endif /** IMAGEPROCESSOR_HPP_ */
