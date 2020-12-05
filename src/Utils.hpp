@@ -36,6 +36,7 @@ typedef std::map<std::string, std::string> params_t;
 
 typedef std::shared_ptr<BaseImageAlgorithm> BaseImageAlgorithm_ptr;
 typedef std::vector<BaseImageAlgorithm_ptr> BaseImageAlgorithm_vec;
+typedef std::vector<BaseImageAlgorithm_vec> BaseImageAlgorithm_vecs;
 typedef std::shared_ptr<ImageDisplay> ImageDisplay_ptr;
 
 /**
@@ -45,6 +46,7 @@ constexpr const char INPUT_DIR_PARAM_NAME[] = "INPUT_DIR";
 constexpr const char OUTPUT_DIR_PARAM_NAME[] = "OUTPUT_DIR";
 constexpr const char DISPLAY_TYPE_PARAM_NAME[] = "DISPLAY_TYPE";
 constexpr const char DELAY_PARAM_NAME[] = "DELAY";
+constexpr const char THRESHOLD_TOLERANCE_PARAM_NAME[] = "THRESHOLD_TOLERANCE";
 
 /**
  * enums

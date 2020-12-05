@@ -10,11 +10,11 @@ public:
     ImageProcessor() = default;
     ~ImageProcessor() = default;
 
-    bool initialize(const BaseImageAlgorithm_vec& algorithms)
+    bool initialize(const BaseImageAlgorithm_vecs& algorithms)
     {
         TRACE();
 
-        m_algorithms = algorithms;
+        m_algorithm_chains = algorithms;
         m_image_count = 0;
 
         // get input image files
@@ -40,10 +40,21 @@ public:
         m_height = first_image.get_height();
         const std::size_t area = m_width * m_height;
     
-        if (m_algorithms.empty())
+        if (m_algorithm_chains.empty())
         {
-            LOG(LogLevel::ERROR, "No algorithms found");
+            LOG(LogLevel::ERROR, "No algorithm chains found");
             return false;
+        }
+
+        size_t chain_idx = 0;
+        for (const auto& algorithms: m_algorithm_chains)
+        {
+            if (algorithms.empty())
+            {
+                LOG(LogLevel::ERROR, "No algorithms found in chain ", chain_idx);
+                return false;
+            }
+            chain_idx++;
         }
 
         // open display if necessary
@@ -53,34 +64,46 @@ public:
         if (display_type == DisplayType::ALL || display_type == DisplayType::FIRST_LAST)
             m_display = std::make_shared<ImageDisplay>("Original");
 
-        // initialize algorithms
-        for (auto& algorithm: m_algorithms)
+        // create output directory
+        path_t base_outputdir = "";
+        if (!ConfigFile::get_param(OUTPUT_DIR_PARAM_NAME, base_outputdir))
         {
-            if (!algorithm)
+            return false;
+        }
+    
+        // initialize algorithms
+        chain_idx = 0;
+        for (auto& algorithms: m_algorithm_chains)
+        {
+            std::stringstream ss;
+            ss << "chain" << chain_idx;
+            const path_t chain_outputdir = base_outputdir / path_t(ss.str());
+            for (auto& algorithm: algorithms)
             {
-                LOG(LogLevel::ERROR, "Found nullptr algorithm");
-                return false;
-            }
-            bool display_flag = false;
-            if (display_type == DisplayType::ALL || (algorithm == m_algorithms.back() && display_type == DisplayType::FIRST_LAST))
-                display_flag = true;
+                if (!algorithm)
+                {
+                    LOG(LogLevel::ERROR, "Found nullptr algorithm");
+                    return false;
+                }
 
-            if (!algorithm->initialize(m_width, m_height, area, display_flag))
-            {
-                return false;
+                const path_t output_dir = chain_outputdir / path_t(algorithm->name());
+                fs::create_directories(output_dir);
+                bool display_flag = false;
+                if (display_type == DisplayType::ALL || (algorithm == algorithms.back() && display_type == DisplayType::FIRST_LAST))
+                    display_flag = true;
+
+                if (!algorithm->initialize(m_width, m_height, area, display_flag, output_dir))
+                {
+                    return false;
+                }
             }
+            chain_idx++;
         }
 
         // set delay
         m_delay = 0.0;
         if (!ConfigFile::get_param(DELAY_PARAM_NAME, m_delay))
             return false;
-
-        // create output directory
-        path_t output_dir = "";
-        if (!ConfigFile::get_param(OUTPUT_DIR_PARAM_NAME, output_dir))
-            return false;
-        fs::create_directories(output_dir);
 
         LOG(LogLevel::DEBUG, "ImageProcessor Initialized");
 
@@ -99,18 +122,23 @@ public:
                 m_display->update_image(input_file);
 
             input.read(input_file);
+            png::image<pixel_t> input_saved = input;
 
-            for (auto& algorithm: m_algorithms)
+            for (auto& algorithms: m_algorithm_chains)
             {
-                output = png::image<pixel_t>(m_width, m_height); // TODO verify this sets zeros
-                if (!algorithm->update(input_file, input, output))
+                input = input_saved;
+                for (auto& algorithm: algorithms)
                 {
-                    return false;
-                }
+                    output = png::image<pixel_t>(m_width, m_height); // TODO verify this sets zeros
+                    if (!algorithm->update(input_file, input, output))
+                    {
+                        return false;
+                    }
 
-                if (m_delay > 0.0)
-                    usleep(m_delay * 1e6);
-                input = output;
+                    if (m_delay > 0.0)
+                        usleep(m_delay * 1e6);
+                    input = output;
+                }
             }
             m_image_count++;
             LOG(LogLevel::TRACE, "Processed Image #", m_image_count);
@@ -133,9 +161,13 @@ public:
            << "    Image height     = " << m_height           << std::endl
            << "    Image area       = " << m_width * m_height << std::endl
            << "  Algorithms used:"                            << std::endl;
-        for (const auto& algorithm: m_algorithms)
+        size_t chain_idx = 0;
+        for (const auto& algorithms: m_algorithm_chains)
         {
-            ss << "    " << algorithm->name() << ": writing images to: " << algorithm->output_dir() << std::endl;
+            ss << "    Chain " << chain_idx << std::endl;
+            for (const auto& algorithm: algorithms)
+                ss << "      " << algorithm->name() << ": writing images to: " << algorithm->output_dir() << std::endl;
+            chain_idx++;
         }
 
         LOG(LogLevel::INFO, ss.str());
@@ -147,9 +179,18 @@ public:
         ss << std::endl
            << "ImageProcessor results:" << std::endl
            << "  Algorithm runtime: (Doesnt include disk reading/writing, image displays, etc.)" << std::endl;
-        for (const auto& algorithm: m_algorithms)
+        size_t chain_idx = 0;
+        for (const auto& algorithms: m_algorithm_chains)
         {
-            ss << "    " << std::left << std::setw(25) << algorithm->name() << " " << algorithm->duration() << " seconds" << std::endl;
+            double total_duration = 0.0;
+            ss << "    Chain " << chain_idx << std::endl;
+            for (const auto& algorithm: algorithms)
+            {
+                ss << "      " << std::left << std::setw(25) << algorithm->name() << " " << algorithm->duration() << " seconds" << std::endl;
+                total_duration += algorithm->duration();
+            }
+            ss << "      Chain " << chain_idx << " total duration    " << total_duration << " seconds" << std::endl;
+            chain_idx++;
         }
 
         LOG(LogLevel::INFO, ss.str());
@@ -160,7 +201,7 @@ private:
 
     std::vector<path_t> m_inputs;
 
-    BaseImageAlgorithm_vec m_algorithms;
+    BaseImageAlgorithm_vecs m_algorithm_chains;
     ImageDisplay_ptr m_display;
 
     std::size_t m_width;

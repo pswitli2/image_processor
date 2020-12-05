@@ -1,20 +1,20 @@
-#ifndef THRESHOLDINGCPU_HPP_
-#define THRESHOLDINGCPU_HPP_
+#ifndef THRESHOLDINGCUDA_HPP_
+#define THRESHOLDINGCUDA_HPP_
 
 #include "BaseImageAlgorithm.hpp"
 #include "ConfigFile.hpp"
 
-class ThresholdingCPU: public BaseImageAlgorithm
+class ThresholdingCUDA: public BaseImageAlgorithm
 {
 public:
 
-    ThresholdingCPU() = default;
+    ThresholdingCUDA() = default;
 
-    ~ThresholdingCPU() override = default;
+    ~ThresholdingCUDA() override = default;
 
     std::string name() const override
     {
-        return "ThresholdingCPU";
+        return "ThresholdingCUDA";
     }
 
     bool initialize_impl() override
@@ -82,4 +82,4 @@ private:
 };
 
 
-#endif /** THRESHOLDINGCPU_HPP_ */
+#endif /** THRESHOLDINGCUDA_HPP_ */

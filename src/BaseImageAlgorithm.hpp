@@ -12,7 +12,7 @@ public:
 
     virtual std::string name() const = 0;
 
-    bool initialize(const std::size_t width, const std::size_t height, const std::size_t area, bool display_flag)
+    bool initialize(const std::size_t width, const std::size_t height, const std::size_t area, bool display_flag, const path_t& output_dir)
     {
         TRACE();
 
@@ -21,20 +21,13 @@ public:
         m_area = area;
         m_image_count = 0;
         m_duration_ns = 0.0;
+        m_outputdir = output_dir;
 
         // init Display if necessary
         if (display_flag)
         {
             m_display = std::make_shared<ImageDisplay>("Post " + name());
         }
-
-        // create output directory
-        if (!ConfigFile::get_param(OUTPUT_DIR_PARAM_NAME, m_outputdir))
-        {
-            return false;
-        }
-        m_outputdir = m_outputdir / path_t(name());
-        fs::create_directories(m_outputdir);
 
         if (!initialize_impl())
         {

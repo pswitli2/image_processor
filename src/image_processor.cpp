@@ -1,5 +1,6 @@
 #include "ImageProcessor.hpp"
 #include "ThresholdingCPU.hpp"
+#include "ThresholdingCUDA.hpp"
 
 static bool parse_args(int argc, const char** argv, path_t& filepath, LogLevel& log_level)
 {
@@ -39,11 +40,18 @@ int main(int argc, const char** argv)
     if (!ConfigFile::initialize(filepath))
         exit(1);
 
-    BaseImageAlgorithm_vec algorithms;
-    algorithms.push_back(std::make_shared<ThresholdingCPU>());
+    BaseImageAlgorithm_vec chain0;
+    chain0.push_back(std::make_shared<ThresholdingCPU>());
+
+    BaseImageAlgorithm_vec chain1;
+    chain1.push_back(std::make_shared<ThresholdingCUDA>());
+
+    BaseImageAlgorithm_vecs algorithm_chains;
+    algorithm_chains.push_back(chain0);
+    algorithm_chains.push_back(chain1);
 
     ImageProcessor processor;
-    if (!processor.initialize(algorithms))
+    if (!processor.initialize(algorithm_chains))
         exit(1);
     processor.log_info();
 
