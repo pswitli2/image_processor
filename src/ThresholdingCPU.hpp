@@ -1,8 +1,6 @@
 #ifndef THRESHOLDINGCPU_HPP_
 #define THRESHOLDINGCPU_HPP_
 
-#include <cmath>
-
 #include "BaseImageAlgorithm.hpp"
 #include "ConfigFile.hpp"
 
@@ -16,7 +14,7 @@ public:
 
     ~ThresholdingCPU() override = default;
 
-    std::string name() override
+    std::string name() const override
     {
         return "ThresholdingCPU";
     }

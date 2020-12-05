@@ -12,7 +12,9 @@ public:
     explicit ImageDisplay(const std::string& title)
     : m_title(title), m_cimgdisplay(), m_cimg()
     {
-        LOG(LogLevel::DEBUG, m_title, " Creating ImageDispaly with title: ", m_title)
+        TRACE();
+
+        LOG(LogLevel::DEBUG, " Creating ImageDisplay with title: ", m_title)
 
         m_cimgdisplay.show();
         set_title();
@@ -27,7 +29,7 @@ public:
 
     void update_image(const path_t& image_path)
     {
-        LOG(LogLevel::TRACE, m_title, " ImageDislay: update_image() with image: ", image_path)
+        TRACE();
 
         m_cimg.assign(image_path.c_str());
         m_cimgdisplay.display(m_cimg);
@@ -38,6 +40,8 @@ private:
 
     void set_title()
     {
+        TRACE();
+
         m_cimgdisplay.set_title("%s", m_title.c_str());
     }
 

@@ -1,10 +1,15 @@
 #ifndef TYPES_H_
 #define TYPES_H_
 
+#include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <map>
 #include <memory>
 #include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 #include <utility>
 
 #include <magic_enum.hpp>

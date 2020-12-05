@@ -1,14 +1,11 @@
 #ifndef LOGGER_HPP_
 #define LOGGER_HPP_
 
-#include <iostream>
-#include <utility>
-
 #include "Utils.hpp"
 
 #define LOG(level, ...) { Logger::_log(__FILE__, __LINE__, level, __VA_ARGS__); }
-
 #define TRACE() { Logger::_log(__FILE__, __LINE__, LogLevel::TRACE, __func__, "()"); }
+
 class Logger
 {
 public:

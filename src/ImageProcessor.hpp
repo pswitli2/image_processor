@@ -67,8 +67,6 @@ public:
 
             if (!algorithm->initialize(m_width, m_height, area, display_flag))
             {
-                LOG(LogLevel::ERROR, "Unable to initialize algorithm: " + algorithm->name());
-
                 return false;
             }
         }
@@ -84,8 +82,7 @@ public:
             return false;
         fs::create_directories(output_dir);
 
-        LOG(LogLevel::INFO, "Creating output directory: ", output_dir);
-        LOG(LogLevel::INFO, "Initialized ImageProcessor (width: ", m_width, ", height: ", m_height, ", area: ", area, ")");
+        LOG(LogLevel::DEBUG, "ImageProcessor Initialized");
 
         return true;
     }
@@ -108,21 +105,55 @@ public:
                 output = png::image<pixel_t>(m_width, m_height); // TODO verify this sets zeros
                 if (!algorithm->update(input_file, input, output))
                 {
-                    LOG(LogLevel::ERROR, "Unable to update algorithm: ", algorithm->name());
                     return false;
                 }
 
-                usleep(m_delay * 1e6);
+                if (m_delay > 0.0)
+                    usleep(m_delay * 1e6);
                 input = output;
             }
             m_image_count++;
             LOG(LogLevel::TRACE, "Processed Image #", m_image_count);
         }
 
+        LOG(LogLevel::DEBUG, "Finished processing images");
         return true;
     }
 
-    std::size_t image_count() { return m_image_count; }
+    std::size_t image_count() const { return m_image_count; }
+
+    void log_info() const
+    {
+        std::stringstream ss;
+        ss << std::endl
+           << "ImageProcessor info:"                          << std::endl
+           << "  Image info:"                                 << std::endl
+           << "    Number of images = " << m_inputs.size()    << std::endl
+           << "    Image width      = " << m_width            << std::endl
+           << "    Image height     = " << m_height           << std::endl
+           << "    Image area       = " << m_width * m_height << std::endl
+           << "  Algorithms used:"                            << std::endl;
+        for (const auto& algorithm: m_algorithms)
+        {
+            ss << "    " << algorithm->name() << ": writing images to: " << algorithm->output_dir() << std::endl;
+        }
+
+        LOG(LogLevel::INFO, ss.str());
+    }
+
+    void log_results() const
+    {
+        std::stringstream ss;
+        ss << std::endl
+           << "ImageProcessor results:" << std::endl
+           << "  Algorithm runtime: (Doesnt include disk reading/writing, image displays, etc.)" << std::endl;
+        for (const auto& algorithm: m_algorithms)
+        {
+            ss << "    " << std::left << std::setw(25) << algorithm->name() << " " << algorithm->duration() << " seconds" << std::endl;
+        }
+
+        LOG(LogLevel::INFO, ss.str());
+    }
 
 protected:
 private:

@@ -1,8 +1,7 @@
 #ifndef BASEIMAGEALGORITHM_HPP_
 #define BASEIMAGEALGORITHM_HPP_
 
-#include <chrono>
-
+#include "ConfigFile.hpp"
 #include "ImageDisplay.hpp"
 
 class BaseImageAlgorithm
@@ -11,7 +10,7 @@ public:
 
     virtual ~BaseImageAlgorithm() = default;
 
-    virtual std::string name() = 0;
+    virtual std::string name() const = 0;
 
     bool initialize(const std::size_t width, const std::size_t height, const std::size_t area, bool display_flag)
     {
@@ -36,13 +35,13 @@ public:
         }
         m_outputdir = m_outputdir / path_t(name());
         fs::create_directories(m_outputdir);
-        LOG(LogLevel::DEBUG, name(), " - Created output directory: ", m_outputdir);
 
         if (!initialize_impl())
         {
-            LOG(LogLevel::DEBUG, name(), " - Failed to initialize");
+            LOG(LogLevel::ERROR, name(), " - Failed to initialize");
             return false;
         }
+
         LOG(LogLevel::DEBUG, name(), " - Initialized");
 
         return true;
@@ -52,16 +51,16 @@ public:
     {
         TRACE();
 
+        m_image_count++;
         const auto start = TIME_NOW();
         if (!update_impl(input, output))
         {
+            LOG(LogLevel::ERROR, name(), " - Failed updating (Image #", m_image_count, ")");
             return false;
         }
-        m_image_count++;
-        LOG(LogLevel::TRACE, name(), " - Updated with Image #", m_image_count);
-
         const auto end = TIME_NOW();
         m_duration_ns += DURATION_NS(end - start);
+        LOG(LogLevel::TRACE, name(), " - Updated (Image #", m_image_count, ", total duration: ", duration(), " sec)");
 
         const path_t output_file = m_outputdir / input_file.filename();
         output.write(std::string(output_file));
@@ -75,15 +74,17 @@ public:
         return true;
     }
 
-    double duration() { return m_duration_ns / 1e9; }
+    double duration() const { return m_duration_ns / 1e9; }
+
+    std::string output_dir() const { return m_outputdir; }
 
 protected:
 
     BaseImageAlgorithm() = default;
 
-    std::size_t width() { return m_width; }
-    std::size_t height() { return m_height; }
-    std::size_t area() { return m_area; }
+    std::size_t width() const { return m_width; }
+    std::size_t height() const { return m_height; }
+    std::size_t area() const { return m_area; }
 
 private:
 

@@ -1,6 +1,4 @@
-#include "ConfigFile.hpp"
 #include "ImageProcessor.hpp"
-#include "Logger.hpp"
 #include "ThresholdingCPU.hpp"
 
 static bool parse_args(int argc, const char** argv, path_t& filepath, LogLevel& log_level)
@@ -47,14 +45,12 @@ int main(int argc, const char** argv)
     ImageProcessor processor;
     if (!processor.initialize(algorithms))
         exit(1);
+    processor.log_info();
 
     if (!processor.process_images())
         exit(1);
 
-    for (const auto& algorithm: algorithms)
-    {
-        LOG(LogLevel::INFO, algorithm->name(), " took ", algorithm->duration(),
-                    " seconds to process ", processor.image_count(), " images");
-    }
+    processor.log_results();
+
     exit(0);
 }
