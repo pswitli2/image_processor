@@ -3,7 +3,7 @@
 
 #include <CImg.h>
 
-#include "Types.hpp"
+#include "Logger.hpp"
 
 class ImageDisplay
 {
@@ -12,29 +12,27 @@ public:
     explicit ImageDisplay(const std::string& title)
     : m_title(title), m_cimgdisplay(), m_cimg()
     {
+        LOG(LogLevel::DEBUG, m_title, " Creating ImageDispaly with title: ", m_title)
+
         m_cimgdisplay.show();
         set_title();
     }
 
     ~ImageDisplay()
     {
+        TRACE();
+
         m_cimgdisplay.close();
     }
 
-    void update_image(const std::string& image_path)
+    void update_image(const path_t& image_path)
     {
+        LOG(LogLevel::TRACE, m_title, " ImageDislay: update_image() with image: ", image_path)
+
         m_cimg.assign(image_path.c_str());
         m_cimgdisplay.display(m_cimg);
         set_title();
     }
-
-    // void wait()
-    // {
-    //     while (!m_cimgdisplay.is_closed())
-    //     {
-    //         m_cimgdisplay.wait();
-    //     }
-    // }
 
 private:
 
@@ -48,7 +46,5 @@ private:
     cimg_library::CImgDisplay m_cimgdisplay;
     cimg_library::CImg<pixel_t> m_cimg;
 };
-
-typedef std::shared_ptr<ImageDisplay> ImageDisplay_ptr;
 
 #endif /** IMAGEDISPLAY_HPP_ */

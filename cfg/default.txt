@@ -1,6 +1,5 @@
 INPUT_DIR=/home/switlpc1/dev/gpu/data/seq1/raw
 OUTPUT_DIR=/home/switlpc1/dev/gpu/data/seq1
 DISPLAY_TYPE=FIRST_LAST
-LOG_LEVEL=DEBUG
 DELAY=0.0
 THRESHOLD_TOLERANCE=1.5

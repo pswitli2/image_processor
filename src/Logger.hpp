@@ -4,37 +4,11 @@
 #include <iostream>
 #include <utility>
 
-#include "Types.hpp"
+#include "Utils.hpp"
 
-enum class LogLevel
-{
-    ERROR,
-    WARN,
-    INFO,
-    DEBUG,
-    TRACE,
-    SIZE
-};
+#define LOG(level, ...) { Logger::_log(__FILE__, __LINE__, level, __VA_ARGS__); }
 
-static inline size_t LogLevelInt(const LogLevel& log_level)
-{
-    return static_cast<size_t>(log_level);
-}
-
-static inline std::string LogLevelString(const LogLevel& level)
-{
-    switch (level)
-    {
-        case LogLevel::ERROR: return "ERROR";
-        case LogLevel::WARN: return "WARN";
-        case LogLevel::INFO: return "INFO";
-        case LogLevel::DEBUG: return "DEBUG";
-        case LogLevel::TRACE: return "TRACE";
-        case LogLevel::SIZE: return "SIZE";
-        default: return "";
-    }
-}
-
+#define TRACE() { Logger::_log(__FILE__, __LINE__, LogLevel::TRACE, __func__, "()"); }
 class Logger
 {
 public:
@@ -42,17 +16,18 @@ public:
     static void initialize(LogLevel level) { m_level = level; }
 
     template<typename ...Args>
-    static void log(LogLevel level, Args && ...args)
+    static void _log(const char* file, int line, LogLevel level, Args && ...args)
     {
         if (level <= m_level)
         {
-            (std::cout << std::setw(5) << LogLevelString(level) << ": " << ... << args) << std::endl;
+            (std::cout << std::left << std::setw(5) << magic_enum::enum_name(level) << " - "
+                       << file << ":" << line << " - " << ... << args) << std::endl;
         }
     }
 
 private:
 
-    inline static LogLevel m_level;
+    inline static LogLevel m_level = LogLevel::ERROR;
 };
 
 #endif /** LOGGER_HPP_ */

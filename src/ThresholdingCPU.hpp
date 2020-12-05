@@ -6,6 +6,8 @@
 #include "BaseImageAlgorithm.hpp"
 #include "ConfigFile.hpp"
 
+constexpr const char THRESHOLD_TOLERANCE_PARAM_NAME[] = "THRESHOLD_TOLERANCE";
+
 class ThresholdingCPU: public BaseImageAlgorithm
 {
 public:
@@ -21,22 +23,23 @@ public:
 
     bool initialize_impl() override
     {
-        if (!ConfigFile::get_double_param("THRESHOLD_TOLERANCE", m_tolerance))
-        {
-            m_error = ConfigFile::error();
+        TRACE();
+
+        if (!ConfigFile::get_param(THRESHOLD_TOLERANCE_PARAM_NAME, m_tolerance))
             return false;
-        }
 
         return true;
     }
 
     bool update_impl(const png::image<pixel_t>& input, png::image<pixel_t>& output) override
     {
+        TRACE();
+
         pixel_t max = 0;
         double mean = 0.0;
-        for (size_t c = 0; c < height(); c++)
+        for (std::size_t c = 0; c < height(); c++)
         {
-            for (size_t r = 0; r < width(); r++)
+            for (std::size_t r = 0; r < width(); r++)
             {
                 const auto p = input.get_pixel(r, c);
                 if (p > max)
@@ -47,9 +50,9 @@ public:
         mean = mean / (double) area();
 
         double stddev = 0.0;
-        for (size_t c = 0; c < height(); c++)
+        for (std::size_t c = 0; c < height(); c++)
         {
-            for (size_t r = 0; r < width(); r++)
+            for (std::size_t r = 0; r < width(); r++)
             {
                 const auto p = input.get_pixel(r, c);
                 stddev += std::pow(std::fabs((double) p - mean), 2.0);
@@ -59,9 +62,9 @@ public:
 
         const auto threshold = mean + (stddev * m_tolerance);
 
-        for (size_t c = 0; c < height(); c++)
+        for (std::size_t c = 0; c < height(); c++)
         {
-            for (size_t r = 0; r < width(); r++)
+            for (std::size_t r = 0; r < width(); r++)
             {
                 const pixel_t p = input.get_pixel(r, c);
 
