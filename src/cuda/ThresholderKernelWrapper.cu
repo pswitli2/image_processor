@@ -5,8 +5,6 @@
 
 #include "CudaUtils.hpp"
 
-__device__ static pixel16_t MAX = std::numeric_limits<pixel16_t>::max() - 1;
-
 __global__ void __sum(const pixel64_t* input, pixel64_t* output, std::size_t length)
 {
     const auto idx = ((blockIdx.x * blockDim.x) + threadIdx.x);
@@ -46,7 +44,7 @@ __global__ void __threshold(const pixel64_t* input, pixel64_t* output, pixel64_t
     const auto in = input[idx];
 
     if (in >= t)
-        output[idx] = (pixel64_t) MAX;
+        output[idx] = (pixel64_t) D_MAX_PIXEL_VAL;
 }
 
 void ThresholderKernelWrapper::sum_image(const pixel64_t* d_input, pixel64_t* d_col, pixel64_t* sum)

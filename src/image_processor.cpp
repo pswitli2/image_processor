@@ -52,6 +52,8 @@ int main(int argc, const char** argv)
 
     BaseImageAlgorithm_vec cuda_chain;
     cuda_chain.push_back(std::make_shared<ThresholderCUDA>());
+    // cuda_chain.push_back(std::make_shared<ThresholderCUDA>());
+    // cuda_chain.push_back(std::make_shared<LonePixelRemoverCUDA>());
 
     BaseImageAlgorithm_vec enhancer_chain;
     enhancer_chain.push_back(std::make_shared<EnhancerCPU>());

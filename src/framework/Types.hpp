@@ -10,6 +10,6 @@ typedef uint16_t pixel16_t;
 typedef uint64_t pixel64_t;
 typedef std::map<std::string, std::string> params_t;
 
-static auto MAX_PIXEL_VAL = std::numeric_limits<pixel16_t>::max();
+#define MAX_PIXEL_VAL 65535
 
 #endif /** TYPES_HPP_ */
