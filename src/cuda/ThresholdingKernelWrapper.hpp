@@ -3,7 +3,6 @@
 
 #include <memory>
 
-#include "CudaUtils.hpp"
 #include "KernelWrapper.hpp"
 
 class ThresholdingKernelWrapper: public KernelWrapper

@@ -12,7 +12,7 @@ public:
 
     virtual std::string name() const = 0;
 
-    bool initialize(const std::size_t width, const std::size_t height, const std::size_t area, bool display_flag, const path_t& output_dir)
+    bool initialize(const std::size_t width, const std::size_t height, const std::size_t area, bool display_flag)
     {
         TRACE();
 
@@ -21,7 +21,6 @@ public:
         m_area = area;
         m_image_count = 0;
         m_duration_ns = 0.0;
-        m_outputdir = output_dir;
 
         // init Display if necessary
         if (display_flag)
@@ -40,19 +39,13 @@ public:
         return true;
     }
 
-    virtual bool update(const path_t& input_file, const image_data_t& input_data, image_data_t& output_data)
+    virtual bool update(const Image& input, Image& output)
     {
         TRACE();
 
-        if (input_data.size() == 0 || input_data.size() != output_data.size())
-        {
-            LOG(LogLevel::ERROR, name(), " - Invalid image sizes");
-            return false;
-        }
-
         m_image_count++;
         const auto start = TIME_NOW();
-        if (!update_impl(input_data, output_data))
+        if (!update_impl(input.data(), output.data()))
         {
             LOG(LogLevel::ERROR, name(), " - Failed updating (Image #", m_image_count, ")");
             return false;
@@ -61,22 +54,15 @@ public:
         m_duration_ns += DURATION_NS(end - start);
         LOG(LogLevel::TRACE, name(), " - Updated (Image #", m_image_count, ", total duration: ", duration(), " sec)");
 
-        const path_t output_file = m_outputdir / input_file.filename();
-        auto output = vec_to_image(output_data, width(), height());
-        output.write(std::string(output_file));
-        LOG(LogLevel::TRACE, name(), " - Wrote image to disk: ", output_file);
-
         if (m_display)
         {
-            m_display->update_image(output_file);
+            m_display->update_image(output);
         }
 
         return true;
     }
 
     double duration() const { return m_duration_ns / 1e9; }
-
-    std::string output_dir() const { return m_outputdir; }
 
 protected:
 
@@ -90,7 +76,7 @@ private:
 
     virtual bool initialize_impl() { return true; }
 
-    virtual bool update_impl(const image_data_t& input, image_data_t& output) = 0;
+    virtual bool update_impl(const pixel64_t* input, pixel64_t* output) = 0;
 
     std::size_t m_width;
     std::size_t m_height;
@@ -99,9 +85,11 @@ private:
 
     double m_duration_ns;
 
-    path_t m_outputdir;
-
     ImageDisplay_ptr m_display;
 };
+
+typedef std::shared_ptr<BaseImageAlgorithm> BaseImageAlgorithm_ptr;
+typedef std::vector<BaseImageAlgorithm_ptr> BaseImageAlgorithm_vec;
+typedef std::vector<BaseImageAlgorithm_vec> BaseImageAlgorithm_vecs;
 
 #endif /** BASEIMAGEALGORITHM_HPP_ */

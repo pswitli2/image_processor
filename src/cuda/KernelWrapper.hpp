@@ -4,9 +4,7 @@
 #include <stdint.h>
 #include <vector>
 
-typedef uint16_t pixel_t;
-typedef uint64_t pixel64_t;
-typedef std::vector<pixel64_t> image_data_t;
+#include "Types.hpp"
 
 class KernelWrapper
 {
@@ -14,7 +12,7 @@ public:
 
     ~KernelWrapper();
 
-    void execute(const image_data_t& input, image_data_t& output);
+    void execute(const pixel64_t* input, pixel64_t* output);
 
 protected:
 

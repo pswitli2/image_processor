@@ -4,7 +4,7 @@
 #include "BaseImageAlgorithm.hpp"
 #include "ConfigFile.hpp"
 
-static pixel_t MAX = std::numeric_limits<pixel_t>::max() - 1;
+static auto MAX = std::numeric_limits<pixel16_t>::max() - 1;
 
 class ThresholdingCPU: public BaseImageAlgorithm
 {
@@ -29,7 +29,7 @@ public:
         return true;
     }
 
-    bool update_impl(const image_data_t& input, image_data_t& output) override
+    bool update_impl(const pixel64_t* input, pixel64_t* output) override
     {
         TRACE();
 
@@ -58,7 +58,7 @@ public:
         LOG(LogLevel::TRACE, "ThresholdingCPU update info: mean = ", mean,
             /*", max = ", max,*/ ", stddev = ", stddev, ", threshold = ", threshold);
 
-        for (size_t i = 0; i < input.size(); i++)
+        for (size_t i = 0; i < area(); i++)
         {
             if (input[i] >= threshold)
                 output[i] = MAX;//max;

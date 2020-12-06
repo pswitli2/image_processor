@@ -3,7 +3,9 @@
 #include <iostream>
 #include <limits>
 
-__device__ static pixel_t MAX = std::numeric_limits<pixel_t>::max() - 1;
+#include "CudaUtils.hpp"
+
+__device__ static pixel16_t MAX = std::numeric_limits<pixel16_t>::max() - 1;
 
 __global__ void __sum(const pixel64_t* input, pixel64_t* output, std::size_t length)
 {

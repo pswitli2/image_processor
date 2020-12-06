@@ -32,7 +32,7 @@ public:
         return true;
     }
 
-    bool update_impl(const image_data_t& input, image_data_t& output)
+    bool update_impl(const pixel64_t* input, pixel64_t* output)
     {
         m_kernel->execute(input, output);
 

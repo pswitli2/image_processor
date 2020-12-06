@@ -163,7 +163,12 @@ bool ConfigFile::get_param(const std::string& key, DisplayType& val)
 
     if (!check_param_exists(key))
         return false;
-    return string_to_enum(m_params[key], val);
+    if (!string_to_enum(m_params[key], val))
+    {
+        LOG(LogLevel::ERROR, "Invalid DISPLAY_TYPE value: ", m_params[key]);
+        return false;
+    }
+    return true;
 }
 
 #endif /** CONFIGFILE_HPP_ */
