@@ -61,7 +61,7 @@ int main(int argc, const char** argv)
     enhancer_chain.push_back(std::make_shared<EnhancerCPU>());
 
     BaseImageAlgorithm_vecs algorithm_chains;
-    // algorithm_chains.push_back(cpu_chain);
+    algorithm_chains.push_back(cpu_chain);
     algorithm_chains.push_back(cuda_chain);
     algorithm_chains.push_back(enhancer_chain);
 
