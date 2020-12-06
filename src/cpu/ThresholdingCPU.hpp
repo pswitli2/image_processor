@@ -32,15 +32,16 @@ public:
         TRACE();
 
         pixel_t max = 0;
-        double mean = 0.0;
+        double sum = 0.0;
         for (std::size_t i = 0; i < area(); i++)
         {
             const auto& p = input[i];
             if (p > max)
                 max = p;
-            mean += (double) p;
+            sum += (double) p;
         }
-        mean = mean / (double) area();
+        const double mean = sum / (double) area();
+        std::cout << "MEAN CPU:    " << sum << "  " << mean << std::endl;
 
         double stddev = 0.0;
         for (std::size_t i = 0; i < area(); i++)
@@ -49,6 +50,7 @@ public:
             stddev += std::pow(std::fabs((double) p - mean), 2.0);
         }
         stddev = sqrt(stddev / (double) area());
+        // std::cout << "STDDEV CPU:  " << stddev << std::endl;
 
         const double threshold = mean + (stddev * m_tolerance);
 

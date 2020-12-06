@@ -4,7 +4,7 @@
 #include "BaseImageAlgorithm.hpp"
 #include "ConfigFile.hpp"
 
-#include "Kernels.h"
+#include "ThresholdingKernelWrapper.hpp"
 
 class ThresholdingCUDA: public BaseImageAlgorithm
 {
@@ -23,15 +23,18 @@ public:
     {
         TRACE();
 
-        if (!ConfigFile::get_param(THRESHOLD_TOLERANCE_PARAM_NAME, m_tolerance))
+        double tolerance = 1.0;
+        if (!ConfigFile::get_param(THRESHOLD_TOLERANCE_PARAM_NAME, tolerance))
             return false;
+
+        m_kernel = std::make_shared<ThresholdingKernelWrapper>(width(), height(), tolerance);
 
         return true;
     }
 
     bool update_impl(const image_data_t& input, image_data_t& output)
     {
-        exec_kernel(input, output);
+        m_kernel->execute(input, output);
 
         return true;
     }
@@ -41,7 +44,7 @@ protected:
 
 private:
 
-    double m_tolerance;
+    ThresholdingKernelWrapper_ptr m_kernel;
 };
 
 
