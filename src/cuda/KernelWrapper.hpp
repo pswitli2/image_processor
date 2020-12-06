@@ -24,8 +24,8 @@ protected:
     std::size_t area() const { return m_area; }
     std::size_t num_bytes() const { return m_numbytes; }
 
-    pixel_t* d_input;
-    pixel_t* d_output;
+    pixel_t* m_d_input;
+    pixel_t* m_d_output;
 
 private:
 

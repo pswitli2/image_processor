@@ -16,7 +16,8 @@ public:
 
 private:
 
-    void sum_image(const pixel_t* input, std::size_t* d_col, std::size_t* sum);
+    template<typename T>
+    void sum_image(const T* input, std::size_t* d_col, std::size_t* sum);
 
     double m_tolerance;
 };
