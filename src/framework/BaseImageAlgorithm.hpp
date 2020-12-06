@@ -71,6 +71,7 @@ protected:
     std::size_t width() const { return m_width; }
     std::size_t height() const { return m_height; }
     std::size_t area() const { return m_area; }
+    std::size_t size_bytes() const { return area() * sizeof(pixel64_t); }
 
 private:
 

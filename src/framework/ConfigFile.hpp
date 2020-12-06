@@ -146,6 +146,28 @@ bool ConfigFile::get_param(const std::string& key, int& val)
 }
 
 template<>
+bool ConfigFile::get_param(const std::string& key, std::size_t& val)
+{
+    TRACE();
+
+    if (!check_param_exists(key))
+        return false;
+    auto parser = [](const std::string& val_str) { return std::stoi(val_str); };
+
+    int signed_val = 0;
+    if (!ConfigFile::parse_number(m_params[key], signed_val, parser))
+        return false;
+    if (signed_val < 0)
+    {
+        LOG(LogLevel::ERROR, "Error getting parameter: ", key, " value must be positive");
+        return false;
+    }
+
+    val = (std::size_t) signed_val;
+    return true;
+}
+
+template<>
 bool ConfigFile::get_param(const std::string& key, double& val)
 {
     TRACE();

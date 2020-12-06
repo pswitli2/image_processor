@@ -52,10 +52,10 @@ __global__ void __threshold(const pixel64_t* input, pixel64_t* output, pixel64_t
 void ThresholdingKernelWrapper::sum_image(const pixel64_t* d_input, pixel64_t* d_col, pixel64_t* sum)
 {
     // sum rows, output sums in d_col
-    __sum<<<height(), 1>>>(d_input, d_col, width());
+    __sum<<<height(), 1, 1, m_stream>>>(d_input, d_col, width());
 
     // sum pixels in d_col, output in d_col[0]
-    __sum<<<1, 1>>>(d_col, d_col, height());
+    __sum<<<1, 1, 1, m_stream>>>(d_col, d_col, height());
    
     // copy sum in d_col[0] to sum
     cudaMemcpy(sum, d_col, sizeof(pixel64_t), cudaMemcpyDeviceToHost);}
@@ -76,7 +76,7 @@ void ThresholdingKernelWrapper::execute_impl()
     const auto mean = sum[0] / (pixel64_t) area();
 
     // set output to - for p in pixels: (p - mean) * (p - mean)
-    __pixel_minus_mean_pow2<<<height(), width()>>>(m_d_input, m_d_output, mean);
+    __pixel_minus_mean_pow2<<<height(), width(), 1, m_stream>>>(m_d_input, m_d_output, mean);
 
     // sum output for standard deviation
     sum_image(m_d_output, d_col, sum);
@@ -88,9 +88,9 @@ void ThresholdingKernelWrapper::execute_impl()
     const auto threshold = mean + (pixel64_t) ((double) stddev * m_tolerance);
 
     // zero out output image
-    __clear_image<<<height(), width()>>>(m_d_output);
+    __clear_image<<<height(), width(), 1, m_stream>>>(m_d_output);
 
-    __threshold<<<height(), width()>>>(m_d_input, m_d_output, threshold);
+    __threshold<<<height(), width(), 1, m_stream>>>(m_d_input, m_d_output, threshold);
 
     CUDA_FREE(&d_col);
 }

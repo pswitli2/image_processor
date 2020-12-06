@@ -1,4 +1,6 @@
 #include "ImageProcessor.hpp"
+#include "BackgroundRemoverCPU.hpp"
+#include "EnhancerCPU.hpp"
 #include "ThresholdingCPU.hpp"
 #include "ThresholdingCUDA.hpp"
 
@@ -42,15 +44,20 @@ int main(int argc, const char** argv)
     if (!ConfigFile::initialize(filepath))
         exit(1);
 
-    BaseImageAlgorithm_vec chain0;
-    chain0.push_back(std::make_shared<ThresholdingCPU>());
+    BaseImageAlgorithm_vec cpu_chain;
+    cpu_chain.push_back(std::make_shared<BackgroundRemoverCPU>());
+    cpu_chain.push_back(std::make_shared<ThresholdingCPU>());
 
-    BaseImageAlgorithm_vec chain1;
-    chain1.push_back(std::make_shared<ThresholdingCUDA>());
+    BaseImageAlgorithm_vec cuda_chain;
+    cuda_chain.push_back(std::make_shared<ThresholdingCUDA>());
+
+    BaseImageAlgorithm_vec enhancer_chain;
+    enhancer_chain.push_back(std::make_shared<EnhancerCPU>());
 
     BaseImageAlgorithm_vecs algorithm_chains;
-    algorithm_chains.push_back(chain0);
-    algorithm_chains.push_back(chain1);
+    algorithm_chains.push_back(cpu_chain);
+    algorithm_chains.push_back(cuda_chain);
+    algorithm_chains.push_back(enhancer_chain);
 
     ImageProcessor processor;
     if (!processor.initialize(algorithm_chains))

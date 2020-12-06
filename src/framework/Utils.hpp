@@ -31,7 +31,9 @@ constexpr const char OUTPUT_DIR_PARAM_NAME[] = "OUTPUT_DIR";
 constexpr const char DISPLAY_TYPE_PARAM_NAME[] = "DISPLAY_TYPE";
 constexpr const char DELAY_PARAM_NAME[] = "DELAY";
 constexpr const char THRESHOLD_TOLERANCE_PARAM_NAME[] = "THRESHOLD_TOLERANCE";
-
+constexpr const char BACKGROUND_HISTORY_LENGTH_PARAM_NAME[] = "BACKGROUND_HISTORY_LENGTH";
+constexpr const char BACKGROUND_TOLERANCE_PARAM_NAME[] = "BACKGROUND_TOLERANCE";
+constexpr const char ENHANCMENT_FACTOR_PARAM_NAME[] = "ENHANCMENT_FACTOR";
 /**
  * enums
  */

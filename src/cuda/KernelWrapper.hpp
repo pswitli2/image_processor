@@ -6,6 +6,8 @@
 
 #include "Types.hpp"
 
+class CUstream_st;
+
 class KernelWrapper
 {
 public:
@@ -25,6 +27,8 @@ protected:
 
     pixel64_t* m_d_input;
     pixel64_t* m_d_output;
+
+    CUstream_st* m_stream;
 
 private:
 
