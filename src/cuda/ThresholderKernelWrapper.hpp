@@ -9,16 +9,19 @@ class ThresholderKernelWrapper: public KernelWrapper
 {
 public:
 
-    ThresholderKernelWrapper(std::size_t width, std::size_t height, double tolerance)
-    : KernelWrapper(width, height), m_tolerance(tolerance) { }
+    ThresholderKernelWrapper(std::size_t width, std::size_t height, double tolerance);
+
+    ~ThresholderKernelWrapper() override;
 
     void execute_impl();
 
 private:
 
-    void sum_image(const pixel64_t* d_input, pixel64_t* d_col, pixel64_t* sum);
+    void sum_image(const pixel64_t* d_input, pixel64_t* sum);
 
     const double m_tolerance;
+
+    pixel64_t* m_d_col;
 };
 
 typedef std::shared_ptr<ThresholderKernelWrapper> ThresholderKernelWrapper_ptr;

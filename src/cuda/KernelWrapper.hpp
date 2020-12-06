@@ -12,7 +12,7 @@ class KernelWrapper
 {
 public:
 
-    ~KernelWrapper();
+    virtual ~KernelWrapper();
 
     void execute(const pixel64_t* input, pixel64_t* output);
 
