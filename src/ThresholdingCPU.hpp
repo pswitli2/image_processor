@@ -27,48 +27,38 @@ public:
         return true;
     }
 
-    bool update_impl(const png::image<pixel_t>& input, png::image<pixel_t>& output) override
+    bool update_impl(const image_data_t& input, image_data_t& output) override
     {
         TRACE();
 
         pixel_t max = 0;
         double mean = 0.0;
-        for (std::size_t c = 0; c < height(); c++)
+        for (std::size_t i = 0; i < area(); i++)
         {
-            for (std::size_t r = 0; r < width(); r++)
-            {
-                const auto p = input.get_pixel(r, c);
-                if (p > max)
-                    max = p;
-                mean += (double) p;
-            }
+            const auto& p = input[i];
+            if (p > max)
+                max = p;
+            mean += (double) p;
         }
         mean = mean / (double) area();
 
         double stddev = 0.0;
-        for (std::size_t c = 0; c < height(); c++)
+        for (std::size_t i = 0; i < area(); i++)
         {
-            for (std::size_t r = 0; r < width(); r++)
-            {
-                const auto p = input.get_pixel(r, c);
-                stddev += std::pow(std::fabs((double) p - mean), 2.0);
-            }
+            const auto p = input[i];
+            stddev += std::pow(std::fabs((double) p - mean), 2.0);
         }
         stddev = sqrt(stddev / (double) area());
 
-        const auto threshold = mean + (stddev * m_tolerance);
+        const double threshold = mean + (stddev * m_tolerance);
 
-        for (std::size_t c = 0; c < height(); c++)
+        LOG(LogLevel::TRACE, "ThresholdingCPU update info: mean = ", mean,
+            ", max = ", max, ", stddev = ", stddev, ", threshold = ", threshold);
+
+        for (size_t i = 0; i < input.size(); i++)
         {
-            for (std::size_t r = 0; r < width(); r++)
-            {
-                const pixel_t p = input.get_pixel(r, c);
-
-                pixel_t new_val = 0;
-                if ((double) p > threshold)
-                    new_val = max;
-                output.set_pixel(r, c, new_val);
-            }
+            if ((double) input[i] >= threshold)
+                output[i] = max;
         }
 
         return true;

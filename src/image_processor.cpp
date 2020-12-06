@@ -29,6 +29,8 @@ static bool parse_args(int argc, const char** argv, path_t& filepath, LogLevel& 
 
 int main(int argc, const char** argv)
 {
+    const auto start = TIME_NOW();
+
     path_t filepath = "";
     LogLevel log_level = LogLevel::ERROR;
 
@@ -60,5 +62,8 @@ int main(int argc, const char** argv)
 
     processor.log_results();
 
+    const auto end = TIME_NOW();
+    const auto duration = DURATION_NS(end - start);
+    LOG(LogLevel::INFO, "Total program execution time: ", duration * 1e-9, " seconds");
     exit(0);
 }

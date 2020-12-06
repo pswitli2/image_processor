@@ -40,13 +40,19 @@ public:
         return true;
     }
 
-    virtual bool update(const path_t& input_file, const image_t& input, image_t& output)
+    virtual bool update(const path_t& input_file, const image_data_t& input_data, image_data_t& output_data)
     {
         TRACE();
 
+        if (input_data.size() == 0 || input_data.size() != output_data.size())
+        {
+            LOG(LogLevel::ERROR, name(), " - Invalid image sizes");
+            return false;
+        }
+
         m_image_count++;
         const auto start = TIME_NOW();
-        if (!update_impl(input, output))
+        if (!update_impl(input_data, output_data))
         {
             LOG(LogLevel::ERROR, name(), " - Failed updating (Image #", m_image_count, ")");
             return false;
@@ -56,6 +62,7 @@ public:
         LOG(LogLevel::TRACE, name(), " - Updated (Image #", m_image_count, ", total duration: ", duration(), " sec)");
 
         const path_t output_file = m_outputdir / input_file.filename();
+        auto output = vec_to_image(output_data, width(), height());
         output.write(std::string(output_file));
         LOG(LogLevel::TRACE, name(), " - Wrote image to disk: ", output_file);
 
@@ -83,7 +90,7 @@ private:
 
     virtual bool initialize_impl() { return true; }
 
-    virtual bool update_impl(const image_t& input, image_t& output) = 0;
+    virtual bool update_impl(const image_data_t& input, image_data_t& output) = 0;
 
     std::size_t m_width;
     std::size_t m_height;

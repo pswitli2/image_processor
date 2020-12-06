@@ -35,7 +35,7 @@ public:
         std::sort(m_inputs.begin(), m_inputs.end());
 
         // open first image to get width and height
-        png::image<pixel_t> first_image(m_inputs.front()); // TODO handle invalid png
+        image_t first_image(m_inputs.front()); // TODO handle invalid png
         m_width = first_image.get_width();
         m_height = first_image.get_height();
         const std::size_t area = m_width * m_height;
@@ -114,30 +114,32 @@ public:
     {
         TRACE();
 
-        png::image<pixel_t> input;
-        png::image<pixel_t> output;
+        image_t input;
+        image_t output;
         for (const auto& input_file: m_inputs)
         {
             if (m_display)
                 m_display->update_image(input_file);
 
             input.read(input_file);
-            png::image<pixel_t> input_saved = input;
+            auto input_data = image_to_vec(input);
+
+            auto input_saved = input_data;
 
             for (auto& algorithms: m_algorithm_chains)
             {
-                input = input_saved;
+                input_data = input_saved;
                 for (auto& algorithm: algorithms)
                 {
-                    output = png::image<pixel_t>(m_width, m_height); // TODO verify this sets zeros
-                    if (!algorithm->update(input_file, input, output))
+                    auto output_data = image_data_t(m_width * m_height, 0);
+                    if (!algorithm->update(input_file, input_data, output_data))
                     {
                         return false;
                     }
 
                     if (m_delay > 0.0)
                         usleep(m_delay * 1e6);
-                    input = output;
+                    input_data = output_data;
                 }
             }
             m_image_count++;
@@ -180,19 +182,22 @@ public:
            << "ImageProcessor results:" << std::endl
            << "  Algorithm runtime: (Doesnt include disk reading/writing, image displays, etc.)" << std::endl;
         size_t chain_idx = 0;
+        double total_duration = 0.0;
         for (const auto& algorithms: m_algorithm_chains)
         {
-            double total_duration = 0.0;
+            double chain_duration = 0.0;
             ss << "    Chain " << chain_idx << std::endl;
             for (const auto& algorithm: algorithms)
             {
                 ss << "      " << std::left << std::setw(25) << algorithm->name() << " " << algorithm->duration() << " seconds" << std::endl;
-                total_duration += algorithm->duration();
+                chain_duration += algorithm->duration();
             }
-            ss << "      Chain " << chain_idx << " total duration    " << total_duration << " seconds" << std::endl;
+            ss << "      Chain " << chain_idx << " total duration    " << chain_duration << " seconds" << std::endl;
             chain_idx++;
+            total_duration += chain_duration;
         }
 
+        ss << "  Total ImageProcessor duration: " << total_duration << std::endl;
         LOG(LogLevel::INFO, ss.str());
     }
 

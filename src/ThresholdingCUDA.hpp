@@ -4,6 +4,8 @@
 #include "BaseImageAlgorithm.hpp"
 #include "ConfigFile.hpp"
 
+#include "Kernels.h"
+
 class ThresholdingCUDA: public BaseImageAlgorithm
 {
 public:
@@ -27,52 +29,13 @@ public:
         return true;
     }
 
-    bool update_impl(const png::image<pixel_t>& input, png::image<pixel_t>& output) override
+    bool update_impl(const image_data_t& input, image_data_t& output)
     {
-        TRACE();
-
-        pixel_t max = 0;
-        double mean = 0.0;
-        for (std::size_t c = 0; c < height(); c++)
-        {
-            for (std::size_t r = 0; r < width(); r++)
-            {
-                const auto p = input.get_pixel(r, c);
-                if (p > max)
-                    max = p;
-                mean += (double) p;
-            }
-        }
-        mean = mean / (double) area();
-
-        double stddev = 0.0;
-        for (std::size_t c = 0; c < height(); c++)
-        {
-            for (std::size_t r = 0; r < width(); r++)
-            {
-                const auto p = input.get_pixel(r, c);
-                stddev += std::pow(std::fabs((double) p - mean), 2.0);
-            }
-        }
-        stddev = sqrt(stddev / (double) area());
-
-        const auto threshold = mean + (stddev * m_tolerance);
-
-        for (std::size_t c = 0; c < height(); c++)
-        {
-            for (std::size_t r = 0; r < width(); r++)
-            {
-                const pixel_t p = input.get_pixel(r, c);
-
-                pixel_t new_val = 0;
-                if ((double) p > threshold)
-                    new_val = max;
-                output.set_pixel(r, c, new_val);
-            }
-        }
+        exec_kernel(input, output);
 
         return true;
     }
+
 
 protected:
 
