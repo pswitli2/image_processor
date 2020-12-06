@@ -15,10 +15,10 @@ LIBS          = -lX11 -lpng
 WARNING_FLAGS = -Wall  -Wextra  -Wno-unused-parameter  -pedantic -Werror
 FLAGS         = $(INCLUDES)
 CXXFLAGS      = $(FLAGS)  -std=c++17 -ggdb -pthread `libpng-config --cflags` -Dcimg_use_png  $(WARNING_FLAGS)
-CXX           = g++ $(CXXFLAGS) # -L/usr/local/cuda-11.1/lib64/ -lcudart -lcuda
+CXX           = g++ $(CXXFLAGS)
 NVCC_FLAGS    = $(FLAGS) -Xcompiler -ggdb
-NVCC          = nvcc $(NVCC_FLAGS) # -L/usr/local/cuda-11.1/lib64/ -lcudart -lcuda
-LDFLAGS       = $(LIBS) `libpng-config --ldflags` # -L/usr/local/cuda-11.1/lib64/ -lcudart -lcuda
+NVCC          = nvcc $(NVCC_FLAGS)
+LDFLAGS       = $(LIBS) `libpng-config --ldflags`
 
 .SUFFIXES:
 .SUFFIXES: .cpp .cu .o

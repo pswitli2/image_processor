@@ -18,4 +18,7 @@ __global__ void __threshold(const pixel64_t* input, pixel64_t* output, pixel64_t
 __global__ void __sum_history(const pixel64_t* input, pixel64_t* output, std::size_t history_size, std::size_t area);
 
 __global__ void __remove_background(const pixel64_t* input, pixel64_t* output, pixel64_t div_val, pixel64_t tolerance);
+
+__global__ void __lone_pixel(const pixel64_t* input, pixel64_t* output, std::size_t num_adjacent, std::size_t width);
+
 #endif /** KERNELS_CU_ */

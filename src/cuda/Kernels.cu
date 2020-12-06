@@ -75,3 +75,24 @@ __global__ void __remove_background(const pixel64_t* input, pixel64_t* output, p
         output[idx] = 0;
 
 }
+
+__global__ void __lone_pixel(const pixel64_t* input, pixel64_t* output, std::size_t num_adjacent, std::size_t width)
+{
+    const auto idx = __get_idx();
+
+    std::size_t idxs[8];
+    idxs[0] = idx - 1;
+    idxs[1] = idx + 1;
+    idxs[2] = idx - width;
+    idxs[3] = idx + width;
+    idxs[4] = idxs[2] - 1;
+    idxs[5] = idxs[2] + 1;
+    idxs[6] = idxs[3] - 1;
+    idxs[7] = idxs[3] + 1;
+    pixel64_t sum = 0;
+    for (std::size_t i = 0; i < 8; i++)
+        sum += input[idxs[i]];
+
+    if (sum < D_MAX_PIXEL_VAL * num_adjacent)
+        output[idx] = 0;
+}
