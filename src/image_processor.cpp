@@ -1,8 +1,9 @@
 #include "ImageProcessor.hpp"
 #include "BackgroundRemoverCPU.hpp"
 #include "EnhancerCPU.hpp"
-#include "ThresholdingCPU.hpp"
-#include "ThresholdingCUDA.hpp"
+#include "LonePixelRemoverCPU.hpp"
+#include "ThresholderCPU.hpp"
+#include "ThresholderCUDA.hpp"
 
 static bool parse_args(int argc, const char** argv, path_t& filepath, LogLevel& log_level)
 {
@@ -46,10 +47,11 @@ int main(int argc, const char** argv)
 
     BaseImageAlgorithm_vec cpu_chain;
     cpu_chain.push_back(std::make_shared<BackgroundRemoverCPU>());
-    cpu_chain.push_back(std::make_shared<ThresholdingCPU>());
+    cpu_chain.push_back(std::make_shared<ThresholderCPU>());
+    cpu_chain.push_back(std::make_shared<LonePixelRemoverCPU>());
 
     BaseImageAlgorithm_vec cuda_chain;
-    cuda_chain.push_back(std::make_shared<ThresholdingCUDA>());
+    cuda_chain.push_back(std::make_shared<ThresholderCUDA>());
 
     BaseImageAlgorithm_vec enhancer_chain;
     enhancer_chain.push_back(std::make_shared<EnhancerCPU>());

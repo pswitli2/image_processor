@@ -1,4 +1,4 @@
-#include "ThresholdingKernelWrapper.hpp"
+#include "ThresholderKernelWrapper.hpp"
 
 #include <iostream>
 #include <limits>
@@ -49,7 +49,7 @@ __global__ void __threshold(const pixel64_t* input, pixel64_t* output, pixel64_t
         output[idx] = (pixel64_t) MAX;
 }
 
-void ThresholdingKernelWrapper::sum_image(const pixel64_t* d_input, pixel64_t* d_col, pixel64_t* sum)
+void ThresholderKernelWrapper::sum_image(const pixel64_t* d_input, pixel64_t* d_col, pixel64_t* sum)
 {
     // sum rows, output sums in d_col
     __sum<<<height(), 1, 1, m_stream>>>(d_input, d_col, width());
@@ -60,7 +60,7 @@ void ThresholdingKernelWrapper::sum_image(const pixel64_t* d_input, pixel64_t* d
     // copy sum in d_col[0] to sum
     cudaMemcpy(sum, d_col, sizeof(pixel64_t), cudaMemcpyDeviceToHost);}
 
-void ThresholdingKernelWrapper::execute_impl()
+void ThresholderKernelWrapper::execute_impl()
 {
     // allocate device column
     pixel64_t* d_col;

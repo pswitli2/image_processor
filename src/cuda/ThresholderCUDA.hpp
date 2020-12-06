@@ -1,22 +1,22 @@
-#ifndef THRESHOLDINGCUDA_HPP_
-#define THRESHOLDINGCUDA_HPP_
+#ifndef THRESHOLDERCUDA_HPP_
+#define THRESHOLDERCUDA_HPP_
 
 #include "BaseImageAlgorithm.hpp"
 #include "ConfigFile.hpp"
 
-#include "ThresholdingKernelWrapper.hpp"
+#include "ThresholderKernelWrapper.hpp"
 
-class ThresholdingCUDA: public BaseImageAlgorithm
+class ThresholderCUDA: public BaseImageAlgorithm
 {
 public:
 
-    ThresholdingCUDA() = default;
+    ThresholderCUDA() = default;
 
-    ~ThresholdingCUDA() override = default;
+    ~ThresholderCUDA() override = default;
 
     std::string name() const override
     {
-        return "ThresholdingCUDA";
+        return "ThresholderCUDA";
     }
 
     bool initialize_impl() override
@@ -27,7 +27,7 @@ public:
         if (!ConfigFile::get_param(THRESHOLD_TOLERANCE_PARAM_NAME, tolerance))
             return false;
 
-        m_kernel = std::make_shared<ThresholdingKernelWrapper>(width(), height(), tolerance);
+        m_kernel = std::make_shared<ThresholderKernelWrapper>(width(), height(), tolerance);
 
         return true;
     }
@@ -44,8 +44,8 @@ protected:
 
 private:
 
-    ThresholdingKernelWrapper_ptr m_kernel;
+    ThresholderKernelWrapper_ptr m_kernel;
 };
 
 
-#endif /** THRESHOLDINGCUDA_HPP_ */
+#endif /** THRESHOLDERCUDA_HPP_ */

@@ -1,22 +1,20 @@
-#ifndef THRESHOLDINGCPU_HPP_
-#define THRESHOLDINGCPU_HPP_
+#ifndef THRESHOLDERCPU_HPP_
+#define THRESHOLDERCPU_HPP_
 
 #include "BaseImageAlgorithm.hpp"
 #include "ConfigFile.hpp"
 
-static auto MAX = std::numeric_limits<pixel16_t>::max() - 1;
-
-class ThresholdingCPU: public BaseImageAlgorithm
+class ThresholderCPU: public BaseImageAlgorithm
 {
 public:
 
-    ThresholdingCPU() = default;
+    ThresholderCPU() = default;
 
-    ~ThresholdingCPU() override = default;
+    ~ThresholderCPU() override = default;
 
     std::string name() const override
     {
-        return "ThresholdingCPU";
+        return "ThresholderCPU";
     }
 
     bool initialize_impl() override
@@ -61,7 +59,7 @@ public:
         for (size_t i = 0; i < area(); i++)
         {
             if (input[i] >= threshold)
-                output[i] = MAX;//max;
+                output[i] = MAX_PIXEL_VAL;
         }
 
         return true;
@@ -75,4 +73,4 @@ private:
 };
 
 
-#endif /** THRESHOLDINGCPU_HPP_ */
+#endif /** THRESHOLDERCPU_HPP_ */
