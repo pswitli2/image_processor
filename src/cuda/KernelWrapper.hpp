@@ -5,7 +5,8 @@
 #include <vector>
 
 typedef uint16_t pixel_t;
-typedef std::vector<pixel_t> image_data_t;
+typedef uint64_t pixel64_t;
+typedef std::vector<pixel64_t> image_data_t;
 
 class KernelWrapper
 {
@@ -24,8 +25,8 @@ protected:
     std::size_t area() const { return m_area; }
     std::size_t num_bytes() const { return m_numbytes; }
 
-    pixel_t* m_d_input;
-    pixel_t* m_d_output;
+    pixel64_t* m_d_input;
+    pixel64_t* m_d_output;
 
 private:
 

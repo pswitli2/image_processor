@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "CudaUtils.hpp"
 #include "KernelWrapper.hpp"
 
 class ThresholdingKernelWrapper: public KernelWrapper
@@ -16,8 +17,7 @@ public:
 
 private:
 
-    template<typename T>
-    void sum_image(const T* input, std::size_t* d_col, std::size_t* sum);
+    void sum_image(const pixel64_t* d_input, pixel64_t* d_col, pixel64_t* sum);
 
     double m_tolerance;
 };

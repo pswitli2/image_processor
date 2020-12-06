@@ -2,7 +2,7 @@
 #include "CudaUtils.hpp"
 
 __host__ KernelWrapper::KernelWrapper(std::size_t width, std::size_t height)
-: m_width(width), m_height(height), m_area(width * height), m_numbytes(m_area * sizeof(pixel_t))
+: m_width(width), m_height(height), m_area(width * height), m_numbytes(m_area * sizeof(pixel64_t))
 {
     CUDA_MALLOC((void**) &m_d_input, num_bytes()); // TODO try cudaMallocHost
     CUDA_MALLOC((void**) &m_d_output, num_bytes());

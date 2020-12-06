@@ -31,8 +31,9 @@ class ImageDisplay;
  */
 typedef fs::path path_t;
 typedef png::gray_pixel_16 pixel_t;
+typedef uint64_t pixel64_t;
 typedef png::image<pixel_t> image_t;
-typedef std::vector<pixel_t> image_data_t;
+typedef std::vector<pixel64_t> image_data_t;
 typedef std::map<std::string, std::string> params_t;
 
 typedef std::shared_ptr<BaseImageAlgorithm> BaseImageAlgorithm_ptr;
@@ -91,7 +92,7 @@ static inline image_t vec_to_image(const image_data_t& image_data, const size_t 
     image_t image(width, height);
     for (size_t r = 0; r < height; r++)
         for (size_t c = 0; c < width; c++)
-            image.set_pixel(c, r, image_data[width * r + c]);
+            image.set_pixel(c, r, (pixel_t) image_data[width * r + c]);
     return image;
 }
 
@@ -100,7 +101,7 @@ static inline image_data_t image_to_vec(const image_t& image)
     image_data_t image_data(image.get_width() * image.get_height());
     for (size_t r = 0; r < image.get_height(); r++)
         for (size_t c = 0; c < image.get_width(); c++)
-            image_data[image.get_width() * r + c] = image.get_pixel(c, r);
+            image_data[image.get_width() * r + c] = (pixel64_t) image.get_pixel(c, r);
     return image_data;
 }
 

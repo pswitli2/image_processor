@@ -31,35 +31,34 @@ public:
     {
         TRACE();
 
-        pixel_t max = 0;
-        double sum = 0.0;
+        pixel64_t max = 0;
+        pixel64_t sum = 0;
         for (std::size_t i = 0; i < area(); i++)
         {
             const auto& p = input[i];
             if (p > max)
                 max = p;
-            sum += (double) p;
+            sum += p;
         }
-        const double mean = sum / (double) area();
-        std::cout << "MEAN CPU:    " << sum << "  " << mean << std::endl;
+        const auto mean = sum / (pixel64_t) area();
 
-        double stddev = 0.0;
+        sum = 0.0;
         for (std::size_t i = 0; i < area(); i++)
         {
-            const auto p = input[i];
-            stddev += std::pow(std::fabs((double) p - mean), 2.0);
+            const auto p = (long long) input[i];
+            const auto mean_long = (long long) mean;
+            sum += (p - mean_long) * (p - mean_long);
         }
-        stddev = sqrt(stddev / (double) area());
-        // std::cout << "STDDEV CPU:  " << stddev << std::endl;
+        const auto stddev = sqrt(sum / (pixel64_t) area());
 
-        const double threshold = mean + (stddev * m_tolerance);
+        const auto threshold = mean + (pixel64_t) ((double) stddev * m_tolerance);
 
         LOG(LogLevel::TRACE, "ThresholdingCPU update info: mean = ", mean,
             ", max = ", max, ", stddev = ", stddev, ", threshold = ", threshold);
 
         for (size_t i = 0; i < input.size(); i++)
         {
-            if ((double) input[i] >= threshold)
+            if (input[i] >= threshold)
                 output[i] = max;
         }
 
