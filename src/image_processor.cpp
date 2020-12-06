@@ -1,7 +1,9 @@
 #include "ImageProcessor.hpp"
 #include "BackgroundRemoverCPU.hpp"
+#include "BackgroundRemoverCUDA.hpp"
 #include "EnhancerCPU.hpp"
 #include "LonePixelRemoverCPU.hpp"
+#include "LonePixelRemoverCUDA.hpp"
 #include "ThresholderCPU.hpp"
 #include "ThresholderCUDA.hpp"
 
@@ -48,11 +50,11 @@ int main(int argc, const char** argv)
     BaseImageAlgorithm_vec cpu_chain;
     cpu_chain.push_back(std::make_shared<BackgroundRemoverCPU>());
     cpu_chain.push_back(std::make_shared<ThresholderCPU>());
-    cpu_chain.push_back(std::make_shared<LonePixelRemoverCPU>());
+    // cpu_chain.push_back(std::make_shared<LonePixelRemoverCPU>());
 
     BaseImageAlgorithm_vec cuda_chain;
+    cuda_chain.push_back(std::make_shared<BackgroundRemoverCUDA>());
     cuda_chain.push_back(std::make_shared<ThresholderCUDA>());
-    // cuda_chain.push_back(std::make_shared<ThresholderCUDA>());
     // cuda_chain.push_back(std::make_shared<LonePixelRemoverCUDA>());
 
     BaseImageAlgorithm_vec enhancer_chain;

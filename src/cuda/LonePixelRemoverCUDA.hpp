@@ -24,7 +24,6 @@ public:
         TRACE();
 
         std::size_t num_adjacent = 0;
-        std::size_t tolerance = 0;
         if (!ConfigFile::get_param(LONE_PIXEL_NUM_ADJACENT_PARAM_NAME, num_adjacent))
             return false;
 

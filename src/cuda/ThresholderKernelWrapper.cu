@@ -3,7 +3,6 @@
 #include <iostream>
 #include <limits>
 
-#include "CudaUtils.hpp"
 #include "Kernels.hpp"
 
 ThresholderKernelWrapper::ThresholderKernelWrapper(std::size_t width, std::size_t height, double tolerance)
