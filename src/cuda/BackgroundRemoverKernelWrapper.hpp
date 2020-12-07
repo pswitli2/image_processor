@@ -5,6 +5,9 @@
 
 #include "KernelWrapper.hpp"
 
+/**
+ * Provide CUDA code for BackgroundRemoverCUDA algorithm.
+ */
 class BackgroundRemoverKernelWrapper: public KernelWrapper
 {
 public:

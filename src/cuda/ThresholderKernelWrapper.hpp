@@ -5,6 +5,9 @@
 
 #include "KernelWrapper.hpp"
 
+/**
+ * Provide CUDA code for ThresholderCUDA algorithm.
+ */
 class ThresholderKernelWrapper: public KernelWrapper
 {
 public:

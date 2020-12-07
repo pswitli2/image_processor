@@ -4,10 +4,16 @@
 #include "Image.hpp"
 #include "Logger.hpp"
 
+/**
+ * ImageDisplay creates a CImgDisplay window and provides functions to update the dispalyed image.
+ */
 class ImageDisplay
 {
 public:
 
+    /**
+     * Create ImageDispaly with a title.
+     */
     explicit ImageDisplay(const std::string& title)
     : m_title(title), m_cimgdisplay()
     {
@@ -19,6 +25,9 @@ public:
         set_title();
     }
 
+    /**
+     * Close display on exit.
+     */
     ~ImageDisplay()
     {
         TRACE();
@@ -26,6 +35,9 @@ public:
         m_cimgdisplay.close();
     }
 
+    /**
+     * Update the display with a new image.
+     */
     void update_image(const Image& image)
     {
         TRACE();

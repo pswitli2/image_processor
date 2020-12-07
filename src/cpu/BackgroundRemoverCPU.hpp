@@ -4,6 +4,15 @@
 #include "BaseImageAlgorithm.hpp"
 #include "ConfigFile.hpp"
 
+/**
+ * The background remover attempts to remove thhe background from an image to focus on
+ * foreground detections. It does this by saving a history, and checking if a pixel value hasnt
+ * changed, if it hasnt, it clears the filter.
+ *
+ * Required Parameters:
+ *     HISTORY_SIZE = length of image history to save
+ *     HISTORY_THRESHOLD = how close a pixel has to be from the history mean to be filtered out
+ */
 class BackgroundRemoverCPU: public BaseImageAlgorithm
 {
 public:
@@ -15,15 +24,13 @@ public:
     {
         if (m_initialized)
         {
+            // delete m_history and m_history_mean
             delete []m_history;
             delete m_history_mean;
         }
     }
 
-    std::string name() const override
-    {
-        return "BackgroundRemoverCPU";
-    }
+    std::string name() const override { return "BackgroundRemoverCPU"; }
 
     bool initialize_impl() override
     {
@@ -35,6 +42,7 @@ public:
         if (!ConfigFile::get_param(BACKGROUND_TOLERANCE_PARAM_NAME, m_tolerance))
             return false;
 
+        // allocate m_history and m_history_mean
         m_idx = 0;
         m_history_full = false;
         m_history = new pixel64_t*[m_history_len];
@@ -54,10 +62,11 @@ public:
 
         memcpy(output, input, size_bytes());
 
+        // if the history is full, filter pixels
         if (m_history_full)
         {
+            // calculate history mean
             memset(m_history_mean, 0, size_bytes());
-
             for (std::size_t i = 0; i < area(); i++)
             {
                 for (std::size_t j = 0; j < m_history_len; j++)
@@ -66,6 +75,7 @@ public:
                 }
             }
 
+            // filter out background pixels
             for (std::size_t i = 0; i < area(); i++)
             {
                 m_history_mean[i] /= m_history_len;
@@ -76,10 +86,11 @@ public:
             }
         }
 
+        // save to history
         memcpy(m_history[m_idx], input, size_bytes());
 
+        // set index for next update
         m_idx = (m_idx + 1) % m_history_len;
-
         if (m_idx == 0)
             m_history_full = true;
         

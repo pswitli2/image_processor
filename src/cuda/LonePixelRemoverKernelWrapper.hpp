@@ -5,6 +5,9 @@
 
 #include "KernelWrapper.hpp"
 
+/**
+ * Provide CUDA code for LonePixelRemoverCUDA algorithm.
+ */
 class LonePixelRemoverKernelWrapper: public KernelWrapper
 {
 public:

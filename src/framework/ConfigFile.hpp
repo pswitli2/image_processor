@@ -1,19 +1,29 @@
 #ifndef CONFIGFILE_HPP_
 #define CONFIGFILE_HPP_
 
+#include <algorithm>
+#include <fstream>
+#include <map>
+#include <vector>
+
 #include "Logger.hpp"
 
+/**
+ * Provide a static ConfigFile class for the framework and all algorithms to use.
+ */
 class ConfigFile
 {
 public:
 
+    /**
+     * Initialize the config file with a filepath
+     */
     static bool initialize(const path_t& filepath)
     {
         TRACE();
 
-        m_filepath = filepath;
-
         // validate ConfigFile exists
+        m_filepath = filepath;
         if (!fs::is_regular_file(m_filepath))
         {
             LOG(LogLevel::ERROR, "ConfigFile is not a file: ", m_filepath.string());
@@ -24,12 +34,14 @@ public:
         // parse ConfigFile
         if (!parse_file())
             return false;
-
         LOG(LogLevel::DEBUG, "ConfigFile initialized");
 
         return true;
     }
 
+    /**
+     * Return a parameter with name=key.
+     */
     template<class T>
     static bool get_param(const std::string& key, T& val)
     {
@@ -131,8 +143,13 @@ private:
     }
 
     inline static path_t m_filepath;
-    inline static params_t m_params;
+    inline static std::map<std::string, std::string> m_params;
 };
+
+/**
+ * Template specializations for parameter types
+ * (int, double, std::size_t, DisplayType)
+ */
 
 template<>
 bool ConfigFile::get_param(const std::string& key, int& val)

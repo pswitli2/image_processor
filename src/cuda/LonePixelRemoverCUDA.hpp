@@ -6,6 +6,10 @@
 
 #include "LonePixelRemoverKernelWrapper.hpp"
 
+/**
+ * See LonePixelRemoverCPU docstring for algorithm description. This implemtation
+ * performs the same calculations using CUDA.
+ */
 class LonePixelRemoverCUDA: public BaseImageAlgorithm
 {
 public:
@@ -14,10 +18,7 @@ public:
 
     ~LonePixelRemoverCUDA() override = default;
 
-    std::string name() const override
-    {
-        return "LonePixelRemoverCUDA";
-    }
+    std::string name() const override { return "LonePixelRemoverCUDA"; }
 
     bool initialize_impl() override
     {

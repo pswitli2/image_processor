@@ -6,6 +6,10 @@
 
 #include "ThresholderKernelWrapper.hpp"
 
+/**
+ * See ThresholderCPU docstring for algorithm description. This implemtation
+ * performs the same calculations using CUDA.
+ */
 class ThresholderCUDA: public BaseImageAlgorithm
 {
 public:
@@ -14,10 +18,7 @@ public:
 
     ~ThresholderCUDA() override = default;
 
-    std::string name() const override
-    {
-        return "ThresholderCUDA";
-    }
+    std::string name() const override { return "ThresholderCUDA"; }
 
     bool initialize_impl() override
     {

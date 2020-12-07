@@ -6,6 +6,10 @@
 
 #include "BackgroundRemoverKernelWrapper.hpp"
 
+/**
+ * See BackgroundRemoverCPU docstring for algorithm description. This implemtation
+ * performs the same calculations using CUDA.
+ */
 class BackgroundRemoverCUDA: public BaseImageAlgorithm
 {
 public:
@@ -14,10 +18,7 @@ public:
 
     ~BackgroundRemoverCUDA() override = default;
 
-    std::string name() const override
-    {
-        return "BackgroundRemoverCUDA";
-    }
+    std::string name() const override { return "BackgroundRemoverCUDA"; }
 
     bool initialize_impl() override
     {

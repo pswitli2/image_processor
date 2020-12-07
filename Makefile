@@ -1,5 +1,4 @@
-# image_processor project Makefile
-# execute make in the given SUBDIRS
+# Makefile - image_processor project Makefile
 
 SUBDIRS = src
 

@@ -4,14 +4,24 @@
 #include "ConfigFile.hpp"
 #include "ImageDisplay.hpp"
 
+/**
+ * Algorithms should inherit from this class to run through ImageProcessor.
+ *     name(), initialize_impl() (optional), and update_impl() should be implemented
+ */
 class BaseImageAlgorithm
 {
 public:
 
     virtual ~BaseImageAlgorithm() = default;
 
+    /**
+     * Return algorithm name
+     * */
     virtual std::string name() const = 0;
 
+    /**
+     * Initialize algoirthm
+     */
     bool initialize(const std::size_t width, const std::size_t height, const std::size_t area, bool display_flag)
     {
         TRACE();
@@ -28,6 +38,7 @@ public:
             m_display = std::make_shared<ImageDisplay>("Post " + name());
         }
 
+        // Call implementations initialize
         if (!initialize_impl())
         {
             LOG(LogLevel::ERROR, name(), " - Failed to initialize");
@@ -39,10 +50,14 @@ public:
         return true;
     }
 
+    /**
+     * Update algorithm with a new image
+     */
     virtual bool update(const Image& input, Image& output)
     {
         TRACE();
 
+        // time and call implementations update
         m_image_count++;
         const auto start = TIME_NOW();
         if (!update_impl(input.data(), output.data()))
@@ -54,6 +69,7 @@ public:
         m_duration_ns += DURATION_NS(end - start);
         LOG(LogLevel::TRACE, name(), " - Updated (Image #", m_image_count, ", total duration: ", duration(), " sec)");
 
+        // update display if necessary
         if (m_display)
         {
             m_display->update_image(output);
@@ -62,12 +78,18 @@ public:
         return true;
     }
 
+    /**
+     * Return total time spent in update_impl() in seconds.
+     */
     double duration() const { return m_duration_ns / 1e9; }
 
 protected:
 
     BaseImageAlgorithm() = default;
 
+    /**
+     * Getters for sizes
+     */
     std::size_t width() const { return m_width; }
     std::size_t height() const { return m_height; }
     std::size_t area() const { return m_area; }

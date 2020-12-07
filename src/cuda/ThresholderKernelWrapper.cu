@@ -38,7 +38,7 @@ void ThresholderKernelWrapper::execute_impl()
     // calculate mean
     const auto mean = sum[0] / (pixel64_t) area();
 
-    // set output to - for p in pixels: (p - mean) * (p - mean)
+    // set output to: for p in pixels: (p - mean) * (p - mean)
     __pixel_minus_mean_pow2<<<height(), width(), 1, m_stream>>>(m_d_input, m_d_output, mean);
 
     // sum output for standard deviation

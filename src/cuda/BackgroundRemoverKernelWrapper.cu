@@ -23,19 +23,23 @@ BackgroundRemoverKernelWrapper::~BackgroundRemoverKernelWrapper()
 
 void BackgroundRemoverKernelWrapper::execute_impl()
 {
+    // copy input to output
     __copy_image<<<width(), height(), 1, m_stream>>>(m_d_input, m_d_output);
 
     if (m_history_full)
     {
+        // if full sum the history and place in m_history_mean
         __sum_history<<<width(), height(), 1, m_stream>>>(m_history, m_history_mean, m_history_size, area());
 
+        // preform background removal
         __remove_background<<<width(), height(), 1, m_stream>>>(m_history_mean, m_d_output, m_history_size, m_tolerance);
     }
 
+    // copy image to history buffer
     __copy_image<<<width(), height(), 1, m_stream>>>(m_d_input, m_history + (area() * m_idx));
 
+    // update history index for next update
     m_idx = (m_idx + 1) % m_history_size;
-
     if (m_idx == 0)
         m_history_full = true;
 }

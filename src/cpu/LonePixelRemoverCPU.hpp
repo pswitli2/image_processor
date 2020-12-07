@@ -4,6 +4,14 @@
 #include "BaseImageAlgorithm.hpp"
 #include "ConfigFile.hpp"
 
+/**
+ * The LonePixelRemover algorithm filters out pixels that are surrounded by
+ * non bright pixels. If a single pixel is bright, and all adjacent pixels arent,
+ * its likely not a valid detection.
+ *
+ * Returied Parameters
+ *     LONE_PIXEL_NUM_ADJACENT = Max number of adjacent bright pixels to be considered a "Lone pixel"
+ */
 class LonePixelRemoverCPU: public BaseImageAlgorithm
 {
 public:
@@ -12,10 +20,7 @@ public:
 
     ~LonePixelRemoverCPU() override = default;
 
-    std::string name() const override
-    {
-        return "LonePixelRemoverCPU";
-    }
+    std::string name() const override { return "LonePixelRemoverCPU"; }
 
     bool initialize_impl() override
     {
@@ -31,13 +36,16 @@ public:
     {
         TRACE();
 
+        // copy input to output
         memcpy(output, input, size_bytes());
 
+        // loop over pixels
         std::vector<std::size_t> surrounding(8);
         for (std::size_t i = 1; i < width() - 1; i++)
         {
             for (std::size_t j = 1; j < height() - 1; j++)
             {
+                // sum surrounding pixel values
                 surrounding.clear();
                 const std::size_t idx = i * height() + j;
                 surrounding.push_back(idx + 1);
@@ -54,6 +62,7 @@ public:
                     sum += input[pixel_idx];
                 }
 
+                // filter out pixel if not enough bright pixels around it
                 if (sum <= MAX_PIXEL_VAL * m_num_adjacent)
                     output[idx] = 0;
             }

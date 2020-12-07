@@ -1,1 +1,1 @@
-http://csr.bu.edu/BU-TIV/BUTIV.html
+bats: http://csr.bu.edu/BU-TIV/data/frio/images/frio-test-seq1-raw.tgz

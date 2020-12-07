@@ -1,5 +1,9 @@
 #include "Kernels.hpp"
 
+/**
+ * See Kernels.hpp for kernel descriptions
+ */
+
 __device__ std::size_t __get_idx()
 {
     return (blockIdx.x * blockDim.x) + threadIdx.x;
@@ -13,7 +17,11 @@ __global__ void __copy_image(const pixel64_t* input, pixel64_t* output)
 __global__ void __sum(const pixel64_t* input, pixel64_t* output, std::size_t length)
 {
     const auto idx = __get_idx();
+
+    // get offset
     const auto offset = idx * length;
+
+    // sum from offset to offset + length
     pixel64_t sum = 0;
     for (std::size_t i = offset; i < offset + length; i++)
     {
@@ -56,6 +64,7 @@ __global__ void __sum_history(const pixel64_t* input, pixel64_t* output, std::si
 {
     const auto pixel_idx = __get_idx();
 
+    // sum single pixel of history array
     pixel64_t sum = 0;
     for (std::size_t i = 0; i < history_size; i++)
     {
@@ -80,6 +89,7 @@ __global__ void __lone_pixel(const pixel64_t* input, pixel64_t* output, std::siz
 {
     const auto idx = __get_idx() + width + 1;
 
+    // sum surrounding pixels
     std::size_t idxs[8];
     idxs[0] = idx - 1;
     idxs[1] = idx + 1;

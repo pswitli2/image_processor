@@ -3,12 +3,23 @@
 
 #include "BaseImageAlgorithm.hpp"
 
+/**
+ * The ImageProcessor handles reading images and routing them through algorithms.
+ */
 class ImageProcessor
 {
 public:
     ImageProcessor() = default;
     ~ImageProcessor() = default;
 
+    /**
+     * Initialize the ImageProcessor with a vector of algorithm vectors
+     * Each algorithm vector represents an algorithm chain. Each image is processed
+     * subsequently through each chain. Example:
+     *     algorithms = { {algo1_cpu, algo2_cpu}, {algo1_cuda, algo2_cuda} }
+     *     image1, image2, ..., imagen -> algo1_cpu -> algo2_cpu
+     *     image1, image2, ..., imagen -> algo1_cuda -> algo2_cuda
+     */
     bool initialize(const BaseImageAlgorithm_vecs &algorithms)
     {
         TRACE();
@@ -40,12 +51,12 @@ public:
         m_height = first_image.height();
         const std::size_t area = m_width * m_height;
 
+        // validate algorithm chains
         if (m_algorithm_chains.empty())
         {
             LOG(LogLevel::ERROR, "No algorithm chains found");
             return false;
         }
-
         size_t chain_idx = 0;
         for (const auto &algorithms : m_algorithm_chains)
         {
@@ -75,10 +86,12 @@ public:
                     return false;
                 }
 
+                // determine if this algorithm should have a dispaly
                 bool display_flag = false;
                 if (display_type == DisplayType::ALL || (algorithm == algorithms.back() && display_type == DisplayType::FIRST_LAST))
                     display_flag = true;
 
+                // initialize algorithm
                 if (!algorithm->initialize(m_width, m_height, area, display_flag))
                 {
                     return false;
@@ -86,7 +99,7 @@ public:
             }
         }
 
-        // set delay
+        // set delay if necessary
         m_delay = 0.0;
         if (!ConfigFile::get_param(DELAY_PARAM_NAME, m_delay))
             return false;
@@ -96,37 +109,53 @@ public:
         return true;
     }
 
+    /**
+     * Process all images. This is the main loop for the processor.
+     */
     bool process_images()
     {
         TRACE();
 
+        // create some images to be used each iteration
         Image input(m_width, m_height);
-        Image input_saved(m_width, m_height);
+        Image original_input(m_width, m_height);
         Image output(m_width, m_height);
+
+        // loop over images
         for (const auto &input_file : m_inputs)
         {
+            // read image from file
             input.read(input_file);
 
+            // display image if necessary
             if (m_display)
                 m_display->update_image(input);            
 
-            input_saved.set(input);
+            // save off input for each chain
+            original_input.set(input);
 
+            // route image through each chain
             for (auto &algorithms : m_algorithm_chains)
             {
                 for (auto &algorithm : algorithms)
                 {
+                    // update algorithm
                     output.clear();
                     if (!algorithm->update(input, output))
                     {
                         return false;
                     }
 
+                    // delay if necessary
                     if (m_delay > 0.0)
                         usleep(m_delay * 1e6);
+    
+                    // set output to next input
                     input.set(output);
                 }
-                input.set(input_saved);
+
+                // reset input to original image
+                input.set(original_input);
             }
             m_image_count++;
             LOG(LogLevel::TRACE, "Processed Image #", m_image_count);
@@ -136,8 +165,14 @@ public:
         return true;
     }
 
+    /**
+     * Get number of images processed
+     */
     std::size_t image_count() const { return m_image_count; }
 
+    /**
+     * Log ImageProcessor information
+     */
     void log_info() const
     {
         std::stringstream ss;
@@ -161,6 +196,9 @@ public:
         LOG(LogLevel::INFO, ss.str());
     }
 
+    /**
+     * Log ImageProcessor results
+     */
     void log_results() const
     {
         std::stringstream ss;
