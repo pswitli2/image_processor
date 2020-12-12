@@ -19,6 +19,9 @@ public:
     /** Initialize the logger with a LogLevel */
     static void initialize(LogLevel level) { m_level = level; }
 
+    /** Ger the log level */
+    static LogLevel getLevel() { return m_level; }
+
     /**
      * Print a log message, this function should not be called directly,
      * instead the above macros should be used.

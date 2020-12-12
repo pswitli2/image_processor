@@ -129,7 +129,7 @@ public:
 
             // display image if necessary
             if (m_display)
-                m_display->update_image(input);            
+                m_display->update_image(input);
 
             // save off input for each chain
             original_input.set(input);
@@ -158,8 +158,13 @@ public:
                 input.set(original_input);
             }
             m_image_count++;
+
+            progress_bar();
+
             LOG(LogLevel::TRACE, "Processed Image #", m_image_count);
         }
+
+        std::cout << std::endl;
 
         LOG(LogLevel::DEBUG, "Finished processing images");
         return true;
@@ -227,6 +232,26 @@ public:
 
 protected:
 private:
+
+    void progress_bar()
+    {
+        if (Logger::getLevel() != LogLevel::TRACE) 
+        {
+            const std::size_t bar_size = 60; 
+            const auto progress = (double) m_image_count / (double) m_inputs.size();
+            std::cout << "Processing images: [";
+            std::size_t pos = (double) bar_size * progress;
+            for (std::size_t i = 0; i < bar_size; ++i) {
+                if (i < pos) std::cout << "=";
+                else if (i == pos) std::cout << ">";
+                else std::cout << " ";
+            }
+            std::cout.precision(4);
+            std::cout << "] " << std::setw(6) << progress * 100.0 << " %\r";
+            std::cout.flush();
+        }
+    }
+
     std::vector<path_t> m_inputs;
 
     BaseImageAlgorithm_vecs m_algorithm_chains;
